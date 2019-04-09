@@ -1,98 +1,32 @@
 ---
-title: API Reference
+title: CPC DBCargo API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - shell
-  - ruby
-  - python
-  - javascript
 
-toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/lord/slate'>Documentation Powered by Slate</a>
-
-includes:
-  - errors
-
-search: true
+search: false
 ---
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the DB Cargo API! This documentation covers data transmission between CPC and DB Cargo, regarding tracker locations, geofence alerts and daily digests.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+We have language bindings in Shell! You can view code examples in the dark area to the right.
 
-This example API documentation page was created with [Slate](https://github.com/lord/slate). Feel free to edit it and use it as a base for your own API's documentation.
+# Authentication on CPC endpoints
 
-# Authentication
+The CPC Endpoints are protected by an API key. This token is required with each request. CPC endpoints expects for the API key to be included in all API requests to the server in the query parameters.
 
-> To authorize, use this code:
+The API key is private and must be stored server-side on DB Cargo systems. It must not be accessible to users (e.g. through the source code or by sniffing network traffic).
 
-```ruby
-require 'kittn'
+Alternative: We can implement OAuth2 if the end-users should be able to log into the app with their CPC user/password credentials.
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
+# CPC Endpoints
 
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
+## Trackers
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-```
-
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+curl "https://dbcargo.cpctracking.dk/api/external/trackers?api_key=YOUR_TOKEN"
 ```
 
 > The above command returns JSON structured like this:
@@ -100,140 +34,122 @@ let kittens = api.kittens.get();
 ```json
 [
   {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
+      "id": 1,
+      "lat": "55.43884667",
+      "lng": "11.81668167",
+      "name": "EG3101",
+      "location_time": "1975-05-21 22:00:00",
+      "speed": 12.2
   },
   {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
+      "id": 2,
+      "lat": "55.43965167",
+      "lng": "11.82323167",
+      "name": "BR185-323",
+      "location_time": "1975-05-21 22:00:00",
+      "speed": 25.3
   }
 ]
 ```
 
-This endpoint retrieves all kittens.
+This endpoint retrieves all trackers with location, name, speed, and a timestamp for the last position.
+
+### Tracker object description
+
+Parameter | Description
+--------- | -----------
+id | The unique Tracker ID of the tracker triggering the event
+lat | The last known latitude of the tracker
+lng | The last known longitude of the tracker
+name | Name of the tracker triggering the event
+location_time | A timestamp in UTC (in format 1975-05-21 22:00:00)
+speed | The last known speed of the tracker
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`GET https://dbcargo.cpctracking.dk/api/external/trackers?api_key=YOUR_TOKEN`
+
+
+
+
+
+
+
+# DB Cargo API Endpoints
+
+## Daily digest export
+
+```shell
+
+```
+
+> The command returns JSON structured like this:
+
+```json
+{
+  "status": "ok",
+}
+```
+
+This endpoint receives a list of all trackers with name, tripmeter, days and distance since last service.
+
+<aside class="notice">This API endpoint is on DB Cargo systems</aside>
+
+### HTTP Request
+
+`POST http://dbcargo.com/api/cpc/daily_digest`
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+Parameter | Description
+--------- | -----------
+trackers | Array of trackers with the format descibed below
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
+### Tracker object description
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+id | The unique Tracker ID of the tracker triggering the event
+name | Name of the tracker triggering the event
+tripmeter | Current tripmeter of the tracker
+days_since_last_service | Days since last service
+km_since_last_service | Distance in km since last service
+timestamp | A timestamp in UTC (in format 1975-05-21 22:00:00)
 
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
+## Receive geofence notifications
 
 ```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
+
 ```
 
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
+> The command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "deleted" : ":("
+  "status": "ok",
 }
 ```
 
-This endpoint deletes a specific kitten.
+This endpoint is triggered on specific geofence notifications.
+
+<aside class="notice">This API endpoint is on DB Cargo systems</aside>
 
 ### HTTP Request
 
-`DELETE http://example.com/kittens/<ID>`
+`POST http://dbcargo.com/api/cpc/geofence_event`
 
-### URL Parameters
+### Query Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to delete
+geofence_id | The unique ID of the geofence
+geofence_name | The name of the geofence
+geofence_event_id | The unique ID of the geofence event.
+geofence_event_direction | The direction in which the event is triggered. One of "north", "south", "east", "west"
+geofence_event_condition | One of "arrive" or "leave"
+geofence_event_message | A human readable text-string of the geofence event name. For instance "arriving-workshop-kolding"
+tracker_id | The unique Tracker ID of the tracker triggering the event
+tracker_name | Name of the tracker triggering the event
+tracker_tripmeter | Current tripmeter of the tracker
+timestamp | A timestamp in UTC (in format 1975-05-21 22:00:00)
 
