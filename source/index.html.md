@@ -83,6 +83,31 @@ speed | The last known speed of the tracker
 
 ```
 
+> Example for daily digest (Values are made up)
+
+```json
+{
+    "trackers": [
+      {
+          "id": 1,
+          "name": "EG3101",
+          "tripmeter": 1122651,
+          "days_since_last_service": 12,
+          "km_since_last_service": 3520,
+          "timestamp": "1975-05-21 22:00:00"
+      },
+      {
+          "id": 2,
+          "name": "BR185-323",
+          "tripmeter": 293191,
+          "days_since_last_service": 9,
+          "km_since_last_service": 2011,
+          "timestamp": "1975-05-21 22:00:00"
+      }
+    ]
+}
+```
+
 > The command returns JSON structured like this:
 
 ```json
@@ -122,7 +147,53 @@ timestamp | A timestamp in UTC (in format 1975-05-21 22:00:00)
 
 ```
 
-> The command returns JSON structured like this:
+> Example for a tracker arriving at a workshop in Kolding (Values are made up)
+
+```json
+{
+    "geofence_id": 10,
+    "geofence_name": "Workshop Kolding",
+    "geofence_event_id": 8,
+    "geofence_event_condition": "arrive",
+    "geofence_event_message": "Arriving at Workshop Kolding",
+    "tracker_id": 2,
+    "tracker_name": "BR185-323",
+    "tracker_tripmeter": 193028,
+    "timestamp": "1975-05-21 22:00:00",
+}
+```
+> Example for a tracker leaving a workshop in Kolding (Values are made up)
+
+```json
+{
+    "geofence_id": 10,
+    "geofence_name": "Workshop Kolding",
+    "geofence_event_id": 9,
+    "geofence_event_condition": "leave",
+    "geofence_event_message": "Leaving Workshop Kolding",
+    "tracker_id": 2,
+    "tracker_name": "BR185-323",
+    "tracker_tripmeter": 193030,
+    "timestamp": "1975-05-21 22:00:00",
+}
+```
+> Example for a tracker passing the danish border from Denmark towards Germany (Values are made up)
+
+```json
+{
+    "geofence_id": 11,
+    "geofence_name": "Danish/German border",
+    "geofence_event_id": 10,
+    "geofence_event_condition": "leave-s",
+    "geofence_event_message": "Leaving Denmark",
+    "tracker_id": 2,
+    "tracker_name": "BR185-323",
+    "tracker_tripmeter": 193990,
+    "timestamp": "1975-05-21 22:00:00",
+}
+```
+
+> The endpoint returns JSON structured like this:
 
 ```json
 {
@@ -145,9 +216,8 @@ Parameter | Description
 geofence_id | The unique ID of the geofence
 geofence_name | The name of the geofence
 geofence_event_id | The unique ID of the geofence event.
-geofence_event_direction | The direction in which the event is triggered. One of "north", "south", "east", "west"
-geofence_event_condition | One of "arrive" or "leave"
-geofence_event_message | A human readable text-string of the geofence event name. For instance "arriving-workshop-kolding"
+geofence_event_condition | One of "arrive" or "leave", can be appended with the direction of arrival (one of "-n", "-s", "-e", "-w") like so: "arrive-n", "arrive-e", "leave-s" etc.
+geofence_event_message | A human readable text-string of the geofence event name.
 tracker_id | The unique Tracker ID of the tracker triggering the event
 tracker_name | Name of the tracker triggering the event
 tracker_tripmeter | Current tripmeter of the tracker
